@@ -9,25 +9,38 @@ class AckInProject::SearchResults
   end
 
   def show
-    puts html_head(
-      :window_title => title,
-      :page_title   => title,
-      :html_head    => header_extra()
-    )
-    puts <<-HTML
-      <h2>Searching for "#{ h search_string }" in #{ searched_in }</h2>
-      <div id="counters"><span id="linecount">0 lines</span> matched in <span id="filecount">0 files</span></div>
-      <script type="text/javascript">searchStarted();</script>
-      <table id="results" width="100%" cellspacing="0">
-    HTML
+    $stdout, out = STDOUT, nil
+    
+    begin
+      if project_directory
+        out = File.new(search_output_file_path, 'w')
+        $stdout = out
+      end
+      
+      puts html_head(
+        :window_title => title,
+        :page_title   => title,
+        :html_head    => header_extra()
+      )
+      puts <<-HTML
+        <h2>Searching for "#{ h search_string }" in #{ searched_in }</h2>
+        <div id="counters"><span id="linecount">0 lines</span> matched in <span id="filecount">0 files</span></div>
+        <script type="text/javascript">searchStarted();</script>
+        <table id="results" width="100%" cellspacing="0">
+      HTML
 
-    AckInProject::Search.new(plist).search
+      AckInProject::Search.new(plist).search
 
-    puts <<-HTML
-      </table>
-      <script type="text/javascript">searchCompleted();</script>
-    HTML
-    html_footer
+      puts <<-HTML
+        </table>
+        <script type="text/javascript">searchCompleted();</script>
+      HTML
+      
+      html_footer
+    ensure
+      $stdout = STDOUT
+      out.close if out
+    end
   end
   
   def title 

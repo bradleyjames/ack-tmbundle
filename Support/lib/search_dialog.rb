@@ -12,6 +12,11 @@ class AckInProject::SearchDialog
     if plist['result']
       block.call(plist)
     end
+    
+    # The search output was written to a file.  If the search is
+    # cancelled the file will contain the previous search results.
+    path = search_output_file_path
+    IO.readlines(path).each {|line| puts line} if File.exist?(path)
   end
   
   def defaults

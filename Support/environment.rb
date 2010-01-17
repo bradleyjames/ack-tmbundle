@@ -1,4 +1,5 @@
 require 'base64'
+require 'tmpdir'
 
 class Module
   # lifted from Rails
@@ -69,6 +70,10 @@ module AckInProject
         ENV['TM_PROJECT_DIRECTORY']
       end
       
+      def search_output_file_path
+        "#{Dir.tmpdir}/#{project_directory.gsub(File::SEPARATOR, '_')}_ack_results.html"
+      end
+      
       protected
 
       def guess_search_directory
@@ -79,7 +84,7 @@ module AckInProject
     end
     
     delegate :bundle_support, :ack, :support_file, :lib_file, :nib_file, :project_directory, 
-      :search_directory, :file_in_search_directory, :searched_in, :to => '::AckInProject::Environment'
+      :search_directory, :file_in_search_directory, :searched_in, :search_output_file_path, :to => '::AckInProject::Environment'
   end
 
   class << self
